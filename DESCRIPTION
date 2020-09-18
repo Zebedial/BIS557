@@ -1,0 +1,19 @@
+Package: bis557
+Title: The package created for BIS557 Homework 1
+Version: 0.0.1
+Authors@R: 
+    person(given = "Zibo",
+           family = "Tian",
+           role = c("aut", "cre"),
+           email = "zibo.tian@yale.edu",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: This package contains several functions mentioned in the instruction of homework 1.
+License: LGPL (>= 2.1)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
+Suggests: 
+    testthat
+Depends: 
+    R (>= 2.10)
