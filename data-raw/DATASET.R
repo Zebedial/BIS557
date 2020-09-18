@@ -2,7 +2,7 @@
 
 usethis::use_data(DATASET, overwrite = TRUE)
 
-setwd("C:\\Users\\ASUS\\Desktop\\BIS557\\homework-1")
+setwd("C:\\Users\\ASUS\\Desktop\\BIS557\\homework-1") #local directory where the data locates
 
 lm_patho<-read.csv("lm_patho.csv",header=T)
 

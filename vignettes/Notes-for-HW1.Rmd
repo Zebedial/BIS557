@@ -1,0 +1,31 @@
+---
+title: "Notes for HW1"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Notes for HW1}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bis557)
+```
+
+All the required materials has been uploaded to Github.$\\$
+$\\$
+In the R folder, "linear_model.R" contains the function definition and the related documentation required by item 2 in this homework. "gradient_descent.R" contains the function definition and the related documentation required by item 5. "lm_patho-doc.R" help documents the dataset "lm_patho" included in the package "bis557" as required by item 3. (More detialed information about each function can be found in the documentation part for each of them).$\\$
+$\\$
+In the data folder, "lm_patho.rda" is added as a dataframe to the package.$\\$
+$\\$
+In the data-raw folder, "DATASET.R" helps to read in the raw dataset.$\\$
+$\\$
+In the tests/testthat folder, "test-linear-model.r" and "test-gradient-descent.r" help to test the functions mentioned before. This fullfills the requirments mentioned in item 4 and 6.$\\$
+$\\$
+The outcomes of item 7 and 8 can be directly found on Github when getting into the page of the package "bis557".
