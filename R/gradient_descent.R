@@ -44,7 +44,6 @@ gradient_descent <- function(formula, data, contrasts = NULL, gamma = 0.0001, ma
     #Sum of squared residuals (error) computed before the update of beta
     ss.a<-t(y)%*%y - 2*t(y)%*%X%*%beta + t(beta)%*%t(X)%*%X%*%beta
 
-    #if (diff==NA)
     while (count<maxiter & diff>tolt) {
 
       #Update beta by gamma times the gradient
