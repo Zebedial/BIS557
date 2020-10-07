@@ -1,0 +1,108 @@
+---
+title: "BIS557 Homework 2"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{BIS557 Homework 2}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bis557)
+```
+
+## Question 1
+
+From the question, we assume for the simple linear regression model, an equivalent form is like $y=X\beta$, where $y=(y_1,...,y_n)^T$, $\beta=(\beta_0,\beta_1)^T$ and $X$ as a $n\times2$ matrix as below:
+$$\begin{pmatrix}1 & x_1\\ 1&x_2\\
+\vdots & \vdots\\1& x_n\end{pmatrix}$$
+Then, we know 
+$$X^TX=\begin{pmatrix}n & \sum\limits_{i=1}^nx_i \\ \sum\limits_{i=1}^nx_i& \sum\limits_{i=1}^nx_i^2\end{pmatrix}$$
+By the closed form formula for inverse of 2 by 2 matrices, we have
+$$(X^TX)^{-1}=\begin{pmatrix}A& B\\ C&D\end{pmatrix}$$
+where
+$$A=\frac{\sum\limits_{i=1}^nx_i^2}{n\sum\limits_{i=1}^nx_i^2-(\sum\limits_{i=1}^nx_i)^2}\ \ \ \ B=-\frac{\sum\limits_{i=1}^nx_i}{n\sum\limits_{i=1}^nx_i^2-(\sum\limits_{i=1}^nx_i)^2}$$
+$$C=-\frac{\sum\limits_{i=1}^nx_i}{n\sum\limits_{i=1}^nx_i^2-(\sum\limits_{i=1}^nx_i)^2}\ \ \ \ D=\frac{n}{n\sum\limits_{i=1}^nx_i^2-(\sum\limits_{i=1}^nx_i)^2} $$
+Then, we have 
+$$(X^TX)^{-1}X^T=\begin{pmatrix}A+Bx_1& \dots & A+Bx_n\\C+Dx_1 & \dots & C+Dx_n\end{pmatrix}$$
+Because $\hat\beta=(\hat\beta_0,\hat\beta_1)^T=(X^TX)^{-1}X^Ty$, we have 
+$$\hat\beta_0=\frac{\sum\limits_{i=1}^ny_i\sum\limits_{i=1}^nx_i^2-\sum\limits_{i=1}^nx_iy_i\sum\limits_{i=1}^nx_i}{n\sum\limits_{i=1}^nx_i^2-(\sum\limits_{i=1}^nx_i)^2}$$
+$$\hat\beta_1=\frac{-\sum\limits_{i=1}^ny_i\sum\limits_{i=1}^nx_i+n\sum\limits_{i=1}^nx_iy_i}{n\sum\limits_{i=1}^nx_i^2-(\sum\limits_{i=1}^nx_i)^2}$$
+which are the least squares estimators.
+
+
+## Question 2
+
+This question involve the function "gradient_descent_os". The code below compare the beta estimates of the original lm() function and the gradient descent method with out of sample accuracy as the loss.
+
+```{r}
+data("iris")
+set.seed(8888)
+gd_os <- gradient_descent_os(Sepal.Length ~ ., iris)$coefficients
+lm <- lm(Sepal.Length ~ ., iris)$coefficients
+cbind(gd,lm)
+
+```
+
+From the illustration showed above, it seems that the coefficient estimates from the gradient descent method with out of sample accuracy as the loss is a little bit different from what we can obtain from the original lm() function. I suspect that the out of sample accuracy is not a good assessment of loss in this case, which potetially induced some bias in the estimation.
+
+
+
+## Question 3
+
+This question involves the function "ridge_regression". The code below show that the function can really handle the collinearity problem.
+
+```{r}
+library(MASS)
+iris.new<-iris
+#Add a perfect collinearity problem
+iris.new$dup<-iris.new$Sepal.Width
+coef(lm.ridge(Sepal.Length ~ ., iris.new, lambda = 0.01))
+ridge_regression(Sepal.Length ~ ., iris.new, lambda = 0.01)$coefficients
+```
+The output above shows that the function "ridge_regression" just works like the lm.ridge() function. 
+
+## Question 4
+
+This question involves the function "optimize_lambda". The code below show that the returned lambda is approximately the optimal lambda that gives the lowest mean squared error.
+
+```{r}
+library(ggplot2)
+
+set.seed(8888)
+lambda <- seq(0, 0.1, 0.001)
+opt <- optimize_lambda(Sepal.Length ~ ., iris, lambda)
+MSE <- opt$MSE
+#Optimal lambda
+opt.lambda <- opt$opt.lambda
+#Prepare a table contain information of MSE and lambdas
+table <- data.frame(cbind(lambda,MSE))
+#Use plot to show our optimal lambda is associated with the smallest MSE (out-of-sample accuracy)
+ggplot(table, aes(x = lambda, y = MSE)) + geom_line() + geom_vline(aes(xintercept=opt.lambda),col="red")
+print(paste("The optimal lambda is ", opt.lambda))
+```
+While the black curve shows the track of the MSE, the red line is set to be a vertical line with the optimal lambda computed as the x-intercpet. 
+
+## Question 5
+
+For the LASSO penalty $\frac{1}{2n} ||Y - X \beta||_2^2 + \lambda ||\beta||_1$. We can write it as
+$$\frac{1}{2n}(Y^TY+\beta^TX^TX\beta-2Y^TX\beta)+\lambda\sum_{j=1}^p|\beta_j|$$
+
+Since the equation above contain abosolute value, we cannot directly take derivatives of it with respective to $\beta$. However, we can consider an arbitrary $\beta_j$ which is one of the element in the $\beta$ vector. Then, we have
+$$f(\beta_j)=\frac{1}{2n}(Y_j^2+X_j^TX_j\beta_j^2-2X_j^TY\beta_j)+\lambda |\beta_j|$$
+where $X^T_jX_j$ is a constant. For convenience, we call it $x\ge 0$. Then, we can discuss the problem by cases.
+
+Suppose $\beta_j \ge 0$, we obtain $\beta_j$ by letting
+$\frac{\partial f(\beta_j)}{\partial \beta_j} = \frac{1}{n}x\beta_j-\frac{1}{n}X_j^TY+\lambda = 0$. Because we know $|X_j^TY|\le n\lambda$ or $X_j^TY\le n\lambda$, which means $\frac{x}{n}\beta_j=\frac{1}{n}X_j^TY-\lambda\le 0$. Hence, $\beta_j$ must be $0$. $\\$
+$\\$
+Similarly, if $\beta_j < 0$, we obtain $\beta_j$ by letting
+$\frac{\partial f(\beta_j)}{\partial \beta_j} = \frac{1}{n}x\beta_j-\frac{1}{n}X_j^TY-\lambda = 0$. This time, because we know $|X_j^TY|\le n\lambda$ or $X_j^TY\ge -n\lambda$, which means $\frac{1}{n}x\beta_j=\frac{1}{n}X_j^TY+\lambda\ge0$. That reach to a contradiction.$\\$
+$\\$
+Hence, we conclude that if $|X_j^TY| \leq n \lambda$, then $\widehat \beta_j^{\text{LASSO}}$ must be zero.
