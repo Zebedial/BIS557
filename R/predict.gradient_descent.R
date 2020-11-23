@@ -4,8 +4,7 @@
 #' @param ... input of dataframe
 #' @return Predicted value of variable of interest given X's.
 #' @export
-#'
-#'
+
 predict.gradient_descent <- function(object, ...) {
   #Make the data input a list
   dots <- list(...)
